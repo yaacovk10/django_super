@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
+    <title>Document</title>
+</head>
+
+<body onload="load_prod(); load_cart()">
+    <h1>Products</h1>
+    <div id="displayProducts"></div>
+    <h1>CART</h1>
+    <div id="displayCart"></div>
+    <script>
+        let products = []
+        let cart = []
+        MY_SERVER = "http://127.0.0.1:8000/"
+        const cart_data = JSON.parse(localStorage.getItem("cart"))
+        const load_prod = async () => {
+            res = await axios.get(MY_SERVER + "product")
+            products = res.data
+            // console.log(products)
+            display_products()
+
+        }
+        const load_cart = () => {
+
+            if (cart_data === null) 
+            {console.log("cart empty")
+                return 
+            }
+            else {
+                cart = cart_data
+                console.log("cart loaded success")
+                display_cart()
+            }
+        }
+        const display_products = () => {
+
+            // displayProducts.innerHTML = products.map(prod => `description : ${prod.description}`)
+            console.log(products)
+            displayProducts.innerHTML = products.map((prod, idx) => `${prod.description}  <button onclick="buy(${idx})">BUY</button>`)
+
+        }
+        const display_cart = () => {
+            displayCart.innerHTML = cart.map((cart_itm, idx) => `${cart_itm.description} , amount =  ${cart_itm.amount} <button onclick="remove(${idx})">REMOVE</button>`)
+
+        }
+
+        const buy = (index) => {
+            prod = products[index]
+            // const item  = cart.filter(x=>x.id === prod.id)
+
+            if (cart.filter(x => x.id === prod.id).length > 0) {
+                current_item = cart.filter(x => x.id === prod.id)[0]
+                current_item.amount += 1
+                // cart.filter(x=>x.id === prod.id)[0].amount
+            }
+            else {
+                cart.push({ "description": prod.description, "amount": 1, "id": prod.id })
+
+            }
+            //add to local storage
+            localStorage.setItem("cart", JSON.stringify(cart))
+            console.table(cart)
+            display_cart()
+
+        }
+
+        // display_products()
+
+
+
+    </script>
+</body>
+
+</html>
